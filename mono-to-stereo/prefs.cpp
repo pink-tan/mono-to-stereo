@@ -3,6 +3,9 @@
 #include "common.h"
 
 #define DEFAULT_BUFFER_MS 64
+// #define DEFAULT_INPUT_DIVICE_NAME L"Digital Audio Interface (USB Digital Audio)"
+// for Windows Japanese Language Shift-JIS
+#define DEFAULT_INPUT_DIVICE_NAME L"デジタル オーディオ インターフェイス (USB Digital Audio)"
 
 void usage(LPCWSTR exe);
 HRESULT get_default_device(IMMDevice **ppMMDevice);
@@ -20,11 +23,11 @@ void usage(LPCWSTR exe) {
         L"\n"
         L"    -? prints this message.\n"
         L"    --list-devices displays the long names of all active capture and render devices.\n"
-        L"    --in-device captures from the specified device to capture (\"Digital Audio Interface (USB Digital Audio)\" if omitted)\n"
+        L"    --in-device captures from the specified device to capture (\"%s\" if omitted)\n"
         L"    --out-device device to stream stereo audio to (default if omitted)\n"
         L"    --buffer-size set the size of the audio buffer, in milliseconds (default to %dms)\n"
         L"    --no-skip-first-sample do not skip the first channel sample",
-        VERSION, exe, exe, exe, DEFAULT_BUFFER_MS
+        VERSION, exe, exe, exe, DEFAULT_INPUT_DIVICE_NAME, DEFAULT_BUFFER_MS
     );
 }
 
@@ -133,7 +136,7 @@ CPrefs::CPrefs(int argc, LPCWSTR argv[], HRESULT &hr)
 
         // open default device if not specified
         if (NULL == m_pMMInDevice) {
-            hr = get_specific_device(L"Digital Audio Interface (USB Digital Audio)", eCapture, &m_pMMInDevice);
+            hr = get_specific_device(DEFAULT_INPUT_DIVICE_NAME, eCapture, &m_pMMInDevice);
             if (FAILED(hr)) {
                 return;
             }
