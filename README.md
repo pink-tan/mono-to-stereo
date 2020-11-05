@@ -9,3 +9,11 @@ Original code based off of [Matthew van Eerde's loopback-capture](https://github
 project.
 
 Run `mono-to-stereo.exe -?` for usage instructions.
+
+---
+# 0.5jp
+for Windows Japanese Language Shift-JIS Localize  
+  
+日本語 Windowsで --in-deviceの引数指定を無しで動く様にデフォルトの入力デバイス名を  
+"デジタル オーディオ インターフェイス (USB Digital Audio)"  
+に変更した。
