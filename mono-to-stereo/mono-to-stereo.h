@@ -7,7 +7,7 @@
 // until the stop event is set
 // any failures will be propagated back via hr
 
-#define VERSION L"0.5jp"
+#define VERSION L"0.51jp"
 
 struct LoopbackCaptureThreadFunctionArguments {
     IMMDevice *pMMInDevice;
