@@ -11,9 +11,22 @@ project.
 Run `mono-to-stereo.exe -?` for usage instructions.
 
 ---
-# 0.5jp
+# 0.51jp
 for Windows Japanese Language Shift-JIS Localize  
   
 日本語 Windowsで --in-deviceの引数指定を無しで動く様にデフォルトの入力デバイス名を  
+"デジタル オーディオ インターフェイス"  
+に変更し、省略時のデバイス名の比較を前方一致にした。  
+※ 正確には部分一致  
+
+前方一致にする事で USB 2.0と USB 3.0のキャプチャデバイスの両方に対応します。  
+例：  
 "デジタル オーディオ インターフェイス (USB Digital Audio)"  
-に変更した。
+"デジタル オーディオ インターフェイス (USB3. 0 capture)"  
+
+また、同一デバイスの場合でも USBの差し込みを変更した場合に数字が付与される場合にも対応します。  
+例：  
+"デジタル オーディオ インターフェイス (2- USB Digital Audio)"  
+
+http://www.neko.ne.jp/~freewing/hardware/usb_hdmi_video_capture_macrosilicon_ms2109_fix_audio_mono_96khz/  
+
