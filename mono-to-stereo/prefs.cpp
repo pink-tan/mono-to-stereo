@@ -5,13 +5,13 @@
 #define DEFAULT_BUFFER_MS 64
 // #define DEFAULT_INPUT_DIVICE_NAME L"Digital Audio Interface (USB Digital Audio)"
 // for Windows Japanese Language Shift-JIS
-#define DEFAULT_INPUT_DIVICE_NAME L"デジタル オーディオ インターフェイス (USB Digital Audio)"
+#define DEFAULT_INPUT_DIVICE_NAME_STARTS_WITH L"デジタル オーディオ インターフェイス"
 
 void usage(LPCWSTR exe);
 HRESULT get_default_device(IMMDevice **ppMMDevice);
 HRESULT list_devices();
 HRESULT list_devices_with_direction(EDataFlow direction, const wchar_t *direction_label);
-HRESULT get_specific_device(LPCWSTR szLongName, EDataFlow direction, IMMDevice **ppMMDevice);
+HRESULT get_specific_device(LPCWSTR szLongName, EDataFlow direction, IMMDevice **ppMMDevice, bool bStrictCompare = true);
 
 void usage(LPCWSTR exe) {
     LOG(
@@ -27,7 +27,7 @@ void usage(LPCWSTR exe) {
         L"    --out-device device to stream stereo audio to (default if omitted)\n"
         L"    --buffer-size set the size of the audio buffer, in milliseconds (default to %dms)\n"
         L"    --no-skip-first-sample do not skip the first channel sample",
-        VERSION, exe, exe, exe, DEFAULT_INPUT_DIVICE_NAME, DEFAULT_BUFFER_MS
+        VERSION, exe, exe, exe, DEFAULT_INPUT_DIVICE_NAME_STARTS_WITH, DEFAULT_BUFFER_MS
     );
 }
 
@@ -136,7 +136,7 @@ CPrefs::CPrefs(int argc, LPCWSTR argv[], HRESULT &hr)
 
         // open default device if not specified
         if (NULL == m_pMMInDevice) {
-            hr = get_specific_device(DEFAULT_INPUT_DIVICE_NAME, eCapture, &m_pMMInDevice);
+            hr = get_specific_device(DEFAULT_INPUT_DIVICE_NAME_STARTS_WITH, eCapture, &m_pMMInDevice, false);
             if (FAILED(hr)) {
                 return;
             }
@@ -283,7 +283,7 @@ HRESULT list_devices_with_direction(EDataFlow direction, const wchar_t *directio
     return S_OK;
 }
 
-HRESULT get_specific_device(LPCWSTR szLongName, EDataFlow direction, IMMDevice **ppMMDevice) {
+HRESULT get_specific_device(LPCWSTR szLongName, EDataFlow direction, IMMDevice **ppMMDevice, bool bStrictCompare) {
     HRESULT hr = S_OK;
 
     *ppMMDevice = NULL;
@@ -356,17 +356,25 @@ HRESULT get_specific_device(LPCWSTR szLongName, EDataFlow direction, IMMDevice *
         }
 
         // is it a match?
-        if (0 == _wcsicmp(pv.pwszVal, szLongName)) {
-            // did we already find it?
-            if (NULL == *ppMMDevice) {
-                *ppMMDevice = pMMDevice;
-                pMMDevice->AddRef();
-            }
-            else {
-                ERR(L"Found (at least) two devices named %ls", szLongName);
-                return E_UNEXPECTED;
-            }
+        bool bFind = false;
+        if (bStrictCompare && 0 == _wcsicmp(pv.pwszVal, szLongName)) {
+            bFind = true;
+        } else
+        if (!bStrictCompare && NULL != wcsstr(pv.pwszVal, szLongName)) {
+            bFind = true;
         }
+
+		if (bFind) {
+			// did we already find it?
+			if (NULL == *ppMMDevice) {
+				*ppMMDevice = pMMDevice;
+				pMMDevice->AddRef();
+			}
+			else {
+				ERR(L"Found (at least) two devices named %ls", szLongName);
+				return E_UNEXPECTED;
+			}
+		}
     }
 
     if (NULL == *ppMMDevice) {
