@@ -11,7 +11,24 @@ project.
 Run `mono-to-stereo.exe -?` for usage instructions.
 
 ---
-# 0.51jp
+# 0.52jp mono-to-stereo FREE WING改造版
+for Windows Japanese Language Shift-JIS Localize  
+  
+デフォルトの出力デバイス名を  
+"CABLE Input (VB-Audio Virtual Cable)"  
+にした。  
+存在しない場合はデフォルトを出力デバイスにします。  
+これで、面倒な引数の指定が一切不要になりました。  
+
+また、引数指定の指定子を  
+-l  
+-i  
+-o  
+-b  
+も受け付ける様にした。  
+  
+---
+# 0.51jp mono-to-stereo FREE WING改造版
 for Windows Japanese Language Shift-JIS Localize  
   
 日本語 Windowsで --in-deviceの引数指定を無しで動く様にデフォルトの入力デバイス名を  
