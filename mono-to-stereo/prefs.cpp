@@ -6,6 +6,7 @@
 // #define DEFAULT_INPUT_DIVICE_NAME L"Digital Audio Interface (USB Digital Audio)"
 // for Windows Japanese Language Shift-JIS
 #define DEFAULT_INPUT_DIVICE_NAME_STARTS_WITH L"デジタル オーディオ インターフェイス"
+#define DEFAULT_OUTPUT_DIVICE_NAME_STARTS_WITH L"CABLE Input (VB-Audio Virtual Cable)"
 
 void usage(LPCWSTR exe);
 HRESULT get_default_device(IMMDevice **ppMMDevice);
@@ -18,16 +19,26 @@ void usage(LPCWSTR exe) {
         L"mono-to-stereo v%s\n"
         L"\n"
         L"%ls -?\n"
-        L"%ls --list-devices\n"
-        L"%ls [--in-device \"Device long name\"] [--out-device \"Device long name\"] [--buffer-size 128] [--no-skip-first-sample]\n"
+		L"%ls --list-devices\n"
+		L"%ls [--in-device \"Device long name\"] [--out-device \"Device long name\"] [--buffer-size 128] [--no-skip-first-sample]\n"
         L"\n"
         L"    -? prints this message.\n"
-        L"    --list-devices displays the long names of all active capture and render devices.\n"
-        L"    --in-device captures from the specified device to capture (\"%s\" if omitted)\n"
-        L"    --out-device device to stream stereo audio to (default if omitted)\n"
-        L"    --buffer-size set the size of the audio buffer, in milliseconds (default to %dms)\n"
+		L"    -l same as --list-devices.\n"
+		L"    -i same as --in-device.\n"
+		L"    -o same as --out-device.\n"
+		L"    -b same as --buffer-size.\n"
+		L"    --list-devices displays the long names of all active capture and render devices.\n"
+		L"    --in-device captures from the specified device to capture\n"
+		L"      (\"%s\" if omitted)\n"
+        L"    --out-device device to stream stereo audio to\n"
+		L"      (\"%s\" or default if omitted)\n"
+        L"    --buffer-size set the size of the audio buffer, in milliseconds\n"
+		L"      (default to %dms)\n"
         L"    --no-skip-first-sample do not skip the first channel sample",
-        VERSION, exe, exe, exe, DEFAULT_INPUT_DIVICE_NAME_STARTS_WITH, DEFAULT_BUFFER_MS
+        VERSION, exe, exe, exe,
+		DEFAULT_INPUT_DIVICE_NAME_STARTS_WITH,
+		DEFAULT_OUTPUT_DIVICE_NAME_STARTS_WITH,
+		DEFAULT_BUFFER_MS
     );
 }
 
@@ -45,7 +56,8 @@ CPrefs::CPrefs(int argc, LPCWSTR argv[], HRESULT &hr)
             usage(argv[0]);
             return;
         }
-        else if (0 == _wcsicmp(argv[1], L"--list-devices")) {
+		// --list-devices, -l
+		else if ((0 == _wcsicmp(argv[1], L"--list-devices")) || (0 == _wcsicmp(argv[1], L"-l"))) {
             // list the devices but don't actually capture
             hr = list_devices();
 
@@ -61,8 +73,8 @@ CPrefs::CPrefs(int argc, LPCWSTR argv[], HRESULT &hr)
         // loop through arguments and parse them
         for (int i = 1; i < argc; i++) {
 
-            // --in-device
-            if (0 == _wcsicmp(argv[i], L"--in-device")) {
+            // --in-device, -i
+            if ((0 == _wcsicmp(argv[i], L"--in-device")) || (0 == _wcsicmp(argv[i], L"-i"))) {
                 if (NULL != m_pMMInDevice) {
                     ERR(L"%s", L"Only one --device switch is allowed");
                     hr = E_INVALIDARG;
@@ -83,8 +95,8 @@ CPrefs::CPrefs(int argc, LPCWSTR argv[], HRESULT &hr)
                 continue;
             }
 
-            // --out-device
-            if (0 == _wcsicmp(argv[i], L"--out-device")) {
+            // --out-device, -o
+            if ((0 == _wcsicmp(argv[i], L"--out-device")) || (0 == _wcsicmp(argv[i], L"-o")) ){
                 if (NULL != m_pMMOutDevice) {
                     ERR(L"%s", L"Only one --device switch is allowed");
                     hr = E_INVALIDARG;
@@ -105,8 +117,8 @@ CPrefs::CPrefs(int argc, LPCWSTR argv[], HRESULT &hr)
                 continue;
             }
 
-            // --buffer-size
-            if (0 == _wcsicmp(argv[i], L"--buffer-size")) {
+            // --buffer-size, -b
+            if ((0 == _wcsicmp(argv[i], L"--buffer-size")) || (0 == _wcsicmp(argv[i], L"-b"))) {
                 if (i++ == argc) {
                     ERR(L"%s", L"--buffer-size switch requires an argument");
                     hr = E_INVALIDARG;
@@ -144,10 +156,13 @@ CPrefs::CPrefs(int argc, LPCWSTR argv[], HRESULT &hr)
 
         // open default device if not specified
         if (NULL == m_pMMOutDevice) {
-            hr = get_default_device(&m_pMMOutDevice);
-            if (FAILED(hr)) {
-                return;
-            }
+			hr = get_specific_device(DEFAULT_OUTPUT_DIVICE_NAME_STARTS_WITH, eCapture, &m_pMMOutDevice, false);
+			if (FAILED(hr)) {
+				hr = get_default_device(&m_pMMOutDevice);
+				if (FAILED(hr)) {
+					return;
+				}
+			}
         }
     }
 }
