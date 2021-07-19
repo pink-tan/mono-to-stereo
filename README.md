@@ -11,6 +11,14 @@ project.
 Run `mono-to-stereo.exe -?` for usage instructions.
 
 ---
+### 対応デバイス
+* Macro Silicon MS2109を使用した USB 2.0/ USB 3.0 HDMIキャプチャ
+* サウンドハウス CLASSIC PRO CHD201 HDMIビデオキャプチャー
+* GENKI ShadowCast
+
+中身は全部 Macro Silicon MS2109
+
+---
 # 0.52jp mono-to-stereo FREE WING改造版
 for Windows Japanese Language Shift-JIS Localize  
   
