@@ -156,7 +156,7 @@ CPrefs::CPrefs(int argc, LPCWSTR argv[], HRESULT &hr)
 
         // open default device if not specified
         if (NULL == m_pMMOutDevice) {
-			hr = get_specific_device(DEFAULT_OUTPUT_DIVICE_NAME_STARTS_WITH, eCapture, &m_pMMOutDevice, false);
+			hr = get_specific_device(DEFAULT_OUTPUT_DIVICE_NAME_STARTS_WITH, eRender, &m_pMMOutDevice, false);
 			if (FAILED(hr)) {
 				hr = get_default_device(&m_pMMOutDevice);
 				if (FAILED(hr)) {
